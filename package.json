@@ -1,0 +1,28 @@
+{
+  "name": "rit-canteen-mern-pro",
+  "version": "2.0.0",
+  "description": "Full-Stack MERN (MongoDB, Express, React, Node.js) Canteen Management System with Live KDS, Digital Wallet & QR Token Ordering",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "server": "node server/server.js",
+    "client": "npm --prefix client run dev",
+    "dev": "node server/server.js",
+    "seed": "node server/seed/seedData.js",
+    "build": "npm --prefix client install && npm --prefix client run build",
+    "install-all": "npm --prefix server install && npm --prefix client install"
+  },
+  "keywords": [
+    "mern",
+    "mongodb",
+    "express",
+    "react",
+    "node",
+    "canteen-management",
+    "kds",
+    "digital-wallet",
+    "token-system"
+  ],
+  "author": "RIT Campus Cafeteria Systems",
+  "license": "MIT"
+}

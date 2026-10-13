@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff & Admin Portal | Rajarambapu Institute of Technology</title>
+  <meta name="description" content="Dedicated administrative portal for Rajarambapu Institute of Technology (RIT) Canteen Managers, Kitchen Chefs, and Counter Staff. Live KDS, revenue KPIs, and menu stock controls.">
+  <link rel="stylesheet" href="style.css?v=10">
+  <style>
+    /* Clean Light Admin Dashboard Styles */
+    .admin-body {
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .portal-tag-badge {
+      font-size: 0.72rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: var(--radius-full);
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body class="admin-body">
+  <!-- Main Admin Navigation Bar -->
+  <header class="navbar admin-nav">
+    <div class="admin-nav-left">
+      <a href="admin.html" class="nav-brand">
+        <div class="brand-red-badge">
+          <span class="brand-badge-main">RIT CANTEEN</span>
+        </div>
+        <div class="brand-text-col">
+          <span class="brand-subtitle">Staff & Admin HQ</span>
+        </div>
+      </a>
+      <span class="portal-tag-badge">🛡️ Ops</span>
+    </div>
+
+    <!-- Admin & Kitchen Nav Links (Visible only when logged in) -->
+    <nav class="nav-navlinks" id="admin-nav-links" style="display: none;">
+      <button type="button" class="nav-btn active" data-tab="overview" id="btn-tab-overview">📊 KPIs</button>
+      <button type="button" class="nav-btn" data-tab="kds" id="btn-tab-kds">👨‍🍳 KDS Board <span id="kds-alert-dot" class="kds-alert-dot" style="display:none;"></span></button>
+      <button type="button" class="nav-btn" data-tab="menu" id="btn-tab-menu">🍽️ Menu</button>
+      <button type="button" class="nav-btn" data-tab="orders" id="btn-tab-orders">📋 Orders</button>
+    </nav>
+
+    <div class="nav-right">
+      <button type="button" class="sound-toggle-btn" id="btn-admin-sound" title="Toggle Sound FX">🔊</button>
+      
+      <!-- Link back to customer canteen website -->
+      <a href="index.html" class="role-pill-btn customer-switch-btn" title="Switch to Customer/Student View">
+        <span>🌐 Customer Site</span> ↗
+      </a>
+
+      <!-- Staff User Profile Pill -->
+      <div id="admin-user-info" class="admin-user-profile-badge" style="display: none;">
+        <div class="user-profile-menu">
+          <img src="" alt="Staff Avatar" class="user-avatar-img" id="admin-avatar">
+          <div class="user-profile-info">
+            <span class="user-profile-name" id="admin-name">Admin</span>
+            <span class="user-profile-role-badge" id="admin-role-badge">ADMIN</span>
+          </div>
+        </div>
+        <button type="button" class="role-pill-btn logout-pill-btn" id="btn-admin-logout">
+          Logout ➔
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================================
+       SECTION 1: STAFF & ADMIN SEPARATE LOGIN
+       ====================================================================== -->
+  <main id="section-staff-auth" class="staff-auth-container">
+    <div class="staff-login-card">
+      <div class="staff-badge-header">
+        <span class="staff-lock-icon">🔒</span>
+        <span>STAFF & MANAGEMENT ACCESS ONLY</span>
+      </div>
+      
+      <h2 class="staff-login-title">Canteen Operations Login</h2>
+      <p class="staff-login-desc">
+        Authenticate with your staff or manager credentials to control menu stock, live kitchen tickets, and revenue metrics.
+      </p>
+
+      <!-- 1-Click Quick Demo Staff Logins -->
+      <div class="staff-quick-label">
+        <span>⚡ 1-CLICK DEMO ACCESS</span>
+      </div>
+      <div class="staff-quick-buttons">
+        <button type="button" class="staff-quick-btn" id="btn-quick-login-admin">
+          <span class="quick-btn-emoji">👑</span>
+          <div class="quick-btn-info">
+            <strong>Canteen Director</strong>
+            <span>Director Vikram (Full Admin)</span>
+          </div>
+        </button>
+        <button type="button" class="staff-quick-btn" id="btn-quick-login-kitchen">
+          <span class="quick-btn-emoji">👨‍🍳</span>
+          <div class="quick-btn-info">
+            <strong>Kitchen Chef</strong>
+            <span>Chef Rajesh (KDS Live Board)</span>
+          </div>
+        </button>
+      </div>
+
+      <div class="staff-divider-strip">
+        <span class="divider-line"></span>
+        <span class="divider-text">OR ENTER CREDENTIALS</span>
+        <span class="divider-line"></span>
+      </div>
+
+      <!-- Staff Email / Password Login Form -->
+      <form id="form-staff-login" class="staff-login-form">
+        <div class="form-group">
+          <label for="staff-email">Staff / Manager Email</label>
+          <div class="input-with-icon">
+            <span class="input-prefix-icon">✉️</span>
+            <input type="email" id="staff-email" required placeholder="admin@campus.edu or kitchen@campus.edu" autocomplete="username">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="staff-password">Password</label>
+          <div class="input-with-icon">
+            <span class="input-prefix-icon">🔑</span>
+            <input type="password" id="staff-password" required placeholder="••••••••" autocomplete="current-password">
+          </div>
+        </div>
+        <button type="submit" class="checkout-submit-btn staff-submit-btn">
+          <span>🔐 Enter Operations Portal</span>
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- ======================================================================
+       SECTION 2: STAFF & ADMIN DASHBOARD (Protected View)
+       ====================================================================== -->
+  <main id="section-admin-dashboard" style="display: none;">
+    <!-- Sub-tab 1: Overview & KPIs -->
+    <div id="subtab-overview" class="admin-container" style="display: block;">
+      <div class="admin-header-row">
+        <div>
+          <h2>📊 Canteen Operations & Revenue Overview</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Real-time performance indicators and database backup controls.</p>
+        </div>
+        <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+          <button type="button" class="modal-action-btn btn-secondary" id="btn-admin-export-db">💾 Export DB (JSON)</button>
+          <label class="modal-action-btn btn-secondary" style="cursor: pointer; display: flex; align-items: center; gap: 0.3rem;">
+            📂 Import DB
+            <input type="file" id="input-admin-import-db" accept=".json" style="display: none;">
+          </label>
+          <button type="button" class="modal-action-btn btn-secondary" id="btn-admin-reset-db" style="color: #ef4444; border-color: rgba(239,68,68,0.3);">🔄 Reset Factory DB</button>
+        </div>
+      </div>
+
+      <!-- KPI Metrics Grid -->
+      <div class="admin-kpis-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon-box" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">💰</div>
+          <div>
+            <div class="kpi-val" id="admin-kpi-revenue">₹0</div>
+            <div class="kpi-title">Total Revenue</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon-box" style="background: rgba(255, 159, 28, 0.15); color: #ff9f1c;">🧾</div>
+          <div>
+            <div class="kpi-val" id="admin-kpi-orders-count">0</div>
+            <div class="kpi-title">Total Orders Logged</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon-box" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">🍳</div>
+          <div>
+            <div class="kpi-val" id="admin-kpi-active-orders">0</div>
+            <div class="kpi-title">Active Orders in Kitchen</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon-box" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">🍱</div>
+          <div>
+            <div class="kpi-val" id="admin-kpi-menu-items">0</div>
+            <div class="kpi-title">Menu Dishes Listed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Cards -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 1rem;">
+        <div class="kds-ticket-card" style="padding: 1.4rem;">
+          <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">👨‍🍳 Kitchen Display System</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">View and manage live orders moving through queue, preparation, and pickup counters.</p>
+          <button type="button" class="modal-action-btn btn-primary" onclick="document.getElementById('btn-tab-kds').click()">Open Kitchen Display ➔</button>
+        </div>
+        <div class="kds-ticket-card" style="padding: 1.4rem;">
+          <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">🍽️ Menu & Stock Management</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Update item prices, add new chef specials, or mark sold-out items out of stock.</p>
+          <button type="button" class="modal-action-btn btn-secondary" onclick="document.getElementById('btn-tab-menu').click()">Manage Menu Catalog ➔</button>
+        </div>
+        <div class="kds-ticket-card" style="padding: 1.4rem;">
+          <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">📋 Master Order Log</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">View all student and faculty orders, order history, table details, and total sales.</p>
+          <button type="button" class="modal-action-btn btn-secondary" onclick="document.getElementById('btn-tab-orders').click()">View All Orders ➔</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub-tab 2: Kitchen KDS Kanban Board -->
+    <div id="subtab-kds" class="kds-container" style="display: none;">
+      <div class="kds-header">
+        <div class="kds-title-col">
+          <h2>👨‍🍳 Kitchen Display System (KDS)</h2>
+          <p>Real-time order tickets for kitchen chefs and pickup coordinators.</p>
+        </div>
+        <div class="kds-stats-pills">
+          <div class="kds-badge" id="admin-kds-queue-count">🟡 In Queue: <strong>0</strong></div>
+          <div class="kds-badge" id="admin-kds-cooking-count">🟠 Cooking: <strong>0</strong></div>
+          <div class="kds-badge" id="admin-kds-ready-count">🟢 Ready at Counter: <strong>0</strong></div>
+        </div>
+      </div>
+
+      <!-- 4-Column Kanban Board -->
+      <div class="kds-kanban-board">
+        <div class="kanban-col col-header-received">
+          <div class="kanban-col-header">
+            <span>🟡 1. New Orders In Queue</span>
+            <span class="kds-col-count" id="admin-kds-count-received">0</span>
+          </div>
+          <div class="kanban-tickets-list" id="admin-kds-col-received"></div>
+        </div>
+
+        <div class="kanban-col col-header-cooking">
+          <div class="kanban-col-header">
+            <span>🟠 2. On Fire & Cooking</span>
+            <span class="kds-col-count" id="admin-kds-count-cooking">0</span>
+          </div>
+          <div class="kanban-tickets-list" id="admin-kds-col-cooking"></div>
+        </div>
+
+        <div class="kanban-col col-header-ready">
+          <div class="kanban-col-header">
+            <span>🟢 3. Ready at Pickup Counter</span>
+            <span class="kds-col-count" id="admin-kds-count-ready">0</span>
+          </div>
+          <div class="kanban-tickets-list" id="admin-kds-col-ready"></div>
+        </div>
+
+        <div class="kanban-col col-header-completed">
+          <div class="kanban-col-header">
+            <span>⚪ 4. Completed & Served</span>
+            <span class="kds-col-count" id="admin-kds-count-completed">0</span>
+          </div>
+          <div class="kanban-tickets-list" id="admin-kds-col-completed"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub-tab 3: Menu Catalog Manager -->
+    <div id="subtab-menu" class="admin-container" style="display: none;">
+      <div class="admin-action-bar">
+        <div>
+          <h2 style="font-size: 1.6rem;">🍽️ Menu Catalog & Stock Controls</h2>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">Toggle stock availability or add new seasonal dishes.</p>
+        </div>
+        <button type="button" class="modal-action-btn btn-primary" id="btn-admin-add-dish-modal">➕ Add New Dish</button>
+      </div>
+
+      <div class="admin-table-wrapper">
+        <table class="admin-data-table">
+          <thead>
+            <tr>
+              <th>Dish</th>
+              <th>Category</th>
+              <th>Diet</th>
+              <th>Price</th>
+              <th>Prep Time</th>
+              <th>Stock Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-menu-list-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Sub-tab 4: All Orders -->
+    <div id="subtab-orders" class="admin-container" style="display: none;">
+      <div class="admin-action-bar">
+        <div>
+          <h2 style="font-size: 1.6rem;">📋 All Orders & Tokens</h2>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">Chronological log of customer orders, tables, and totals.</p>
+        </div>
+      </div>
+
+      <div class="admin-table-wrapper">
+        <table class="admin-data-table">
+          <thead>
+            <tr>
+              <th>Token / ID</th>
+              <th>Customer</th>
+              <th>Items Ordered</th>
+              <th>Dining Type</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Quick Action</th>
+            </tr>
+          </thead>
+          <tbody id="admin-orders-list-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+
+  </main>
+
+  <!-- ======================================================================
+       FOOTER: DEVELOPER SIGNATURE & BRANDING
+       ====================================================================== -->
+  <!-- ======================================================================
+       FOOTER: OPERATIONS DIRECTORY & DEVELOPER SHOWCASE
+       ====================================================================== -->
+  <footer class="site-footer" id="site-footer">
+    <div class="footer-container">
+      
+      <!-- Top 4-Column Directory Grid -->
+      <div class="footer-top-grid">
+        <!-- Col 1: Operations Brand -->
+        <div class="footer-col-brand">
+          <div class="footer-brand-header">
+            <div class="footer-logo-badge staff-badge">STAFF</div>
+            <div>
+              <span class="footer-brand-title">RIT CANTEEN PRO</span>
+              <div style="font-size: 0.76rem; color: #34d399; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">Operations & Kitchen Command</div>
+            </div>
+          </div>
+          <p class="footer-brand-desc">
+            Kitchen Display System (KDS), Cashier Billing, Real-Time Inventory, and Daily Revenue Control for Rajarambapu Institute of Technology dining facilities.
+          </p>
+          <div class="footer-status-pill">
+            <span class="status-live-dot"></span>
+            <span>Local Database Active • Zero Latency Sync</span>
+          </div>
+        </div>
+
+        <!-- Col 2: Fast Operations Shortcuts -->
+        <div>
+          <h4 class="footer-col-title">
+            <span>⚡</span> Portal Modules
+          </h4>
+          <ul class="footer-links-list">
+            <li><a href="javascript:void(0)" onclick="document.querySelector('[data-admin-tab=kds]')?.click(); window.scrollTo({top: 0, behavior: 'smooth'});">🍳 Live Kitchen Display (KDS)</a></li>
+            <li><a href="javascript:void(0)" onclick="document.querySelector('[data-admin-tab=cashier]')?.click(); window.scrollTo({top: 0, behavior: 'smooth'});">🧾 Cashier & POS Terminal</a></li>
+            <li><a href="javascript:void(0)" onclick="document.querySelector('[data-admin-tab=orders]')?.click(); window.scrollTo({top: 0, behavior: 'smooth'});">📋 All Orders Master Log</a></li>
+            <li><a href="javascript:void(0)" onclick="document.querySelector('[data-admin-tab=menu]')?.click(); window.scrollTo({top: 0, behavior: 'smooth'});">🥘 Menu & Dish Inventory</a></li>
+            <li><a href="javascript:void(0)" onclick="document.querySelector('[data-admin-tab=analytics]')?.click(); window.scrollTo({top: 0, behavior: 'smooth'});">📊 Revenue & Counter Analytics</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Counter Status -->
+        <div>
+          <h4 class="footer-col-title">
+            <span>🏪</span> Counter Allocation
+          </h4>
+          <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+            <div class="footer-counter-badge">
+              <strong>Counter 1 — Express Bites</strong>
+              <span>Fast-food, snacks, fries and momos kitchen</span>
+            </div>
+            <div class="footer-counter-badge">
+              <strong>Counter 2 — Main Hot Kitchen</strong>
+              <span>Heavy cooking, South/North meals, rice & curry</span>
+            </div>
+            <div class="footer-counter-badge">
+              <strong>Counter 3 — Beverage & Dessert Bar</strong>
+              <span>Cold brews, juices, milkshakes and ice creams</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Col 4: System Diagnostics -->
+        <div>
+          <h4 class="footer-col-title">
+            <span>🛡️</span> Security & Storage
+          </h4>
+          <ul class="footer-links-list">
+            <li><span>💾 Storage: <strong>Local Database (IndexedDB / LocalStorage)</strong></span></li>
+            <li><span>🔄 Real-time Event Broadcaster: <strong>Active</strong></span></li>
+            <li><span>🔐 Role Hierarchy: <strong>Staff, Chef, Manager & Superadmin</strong></span></li>
+            <li><span>📡 Offline-First Resilience: <strong>Enabled</strong></span></li>
+            <li><span>⚡ Zero Cloud Dependency</span></li>
+          </ul>
+        </div>
+      </div>
+
+
+
+      <!-- Bottom Legal Strip -->
+      <div class="footer-bottom-strip">
+        <div class="footer-copy">
+          © 2026 RIT Canteen Pro Operations Portal. Built for Rajarambapu Institute of Technology.
+        </div>
+        <div class="footer-bottom-badges">
+          <span class="footer-badge-item">🛡️ Authorized Staff Only</span>
+          <span style="color: rgba(255, 255, 255, 0.2);">•</span>
+          <span class="footer-badge-item">⚡ 0ms Instant KDS Latency</span>
+          <span style="color: rgba(255, 255, 255, 0.2);">•</span>
+          <span class="footer-badge-item">🏢 Campus Production Build</span>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ======================================================================
+       MODAL: ADD NEW DISH (ADMIN)
+       ====================================================================== -->
+  <div class="modal-backdrop" id="admin-modal-add-dish" aria-hidden="true">
+    <div class="auth-box" style="max-width: 520px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.3rem;">➕ Add New Dish to Menu</h3>
+        <button type="button" class="cart-close-btn" id="btn-admin-close-dish-modal">✕</button>
+      </div>
+
+      <form id="admin-form-add-dish">
+        <div class="form-group">
+          <label for="admin-dish-name">Dish Name:</label>
+          <input type="text" id="admin-dish-name" required placeholder="e.g. Masala Fried Idli">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label for="admin-dish-category">Category:</label>
+            <select id="admin-dish-category" required>
+              <option value="breakfast">Breakfast</option>
+              <option value="snacks">Snacks & Street Food</option>
+              <option value="meals">Lunch & Thalis</option>
+              <option value="fastfood">Burgers & Fast Food</option>
+              <option value="beverages">Beverages & Shakes</option>
+              <option value="desserts">Desserts & Sweets</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="admin-dish-diet">Dietary Type:</label>
+            <select id="admin-dish-diet" required>
+              <option value="veg">Pure Veg 🟢</option>
+              <option value="non-veg">Non-Veg 🔴</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label for="admin-dish-price">Price (₹):</label>
+            <input type="number" id="admin-dish-price" min="5" step="1" required placeholder="e.g. 75">
+          </div>
+          <div class="form-group">
+            <label for="admin-dish-preptime">Prep Time (Mins):</label>
+            <input type="number" id="admin-dish-preptime" min="1" max="60" value="8" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="admin-dish-image">Photo URL (Unsplash or Web):</label>
+          <input type="url" id="admin-dish-image" placeholder="https://images.unsplash.com/..." required value="https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600">
+        </div>
+
+        <div class="form-group">
+          <label for="admin-dish-desc">Description:</label>
+          <textarea id="admin-dish-desc" rows="2" placeholder="Brief mouth-watering description..."></textarea>
+        </div>
+
+        <button type="submit" class="checkout-submit-btn">Save Dish to Catalog</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="admin-toast-container" aria-live="polite"></div>
+
+  <!-- Application Logic Scripts -->
+  <script src="data.js"></script>
+  <script src="db.js"></script>
+  <script src="sound.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

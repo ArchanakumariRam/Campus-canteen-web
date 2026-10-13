@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RIT Canteen | Campus Smart Cafeteria</title>
+  <meta name="description" content="RIT Canteen - Official campus dining portal of Rajarambapu Institute of Technology. Order fresh meals online, pay with smart meal wallet, and track live tokens.">
+  <link rel="stylesheet" href="style.css?v=10">
+</head>
+<body>
+  <!-- Confetti Canvas for Order Celebrations -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- ======================================================================
+       TOP BAR: CAMPUS INFO & QUICK DEMO SWITCHER
+       ====================================================================== -->
+  <aside class="top-info-banner" aria-label="Campus Information & Customer Preview">
+    <div class="top-info-inner">
+      <div class="top-info-left">
+        <span class="campus-loc-icon">📍</span>
+        <span class="top-campus-text"><strong>Rajarambapu Institute of Technology</strong> • Campus Cafeteria</span>
+        <span class="top-divider">|</span>
+        <span class="top-time-text">⏰ Open: 7:30 AM – 9:00 PM</span>
+      </div>
+
+      <div class="top-info-right">
+        <div class="top-helpline">
+          <span>Customer Helpline:</span>
+          <strong>+91 4563 233 700</strong>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ======================================================================
+       MAIN HEADER: LOGO, SEARCH BAR, WALLET & PLATE/CART
+       ====================================================================== -->
+  <header class="header-main-bar" id="main-header">
+    <div class="header-inner">
+      <!-- Brand Logo: RIT CANTEEN -->
+      <a href="#" class="header-brand-box" id="brand-link">
+        <div class="brand-red-badge">
+          <span class="brand-badge-main">RIT CANTEEN</span>
+        </div>
+        <span class="brand-institution">RAJARAMBAPU INSTITUTE OF TECHNOLOGY</span>
+      </a>
+
+      <!-- Center Search Bar -->
+      <div class="header-search-box">
+        <div class="search-input-group">
+          <span class="search-lens-icon">🔍</span>
+          <input type="text" id="menu-search-input" class="search-input-field" placeholder="Search for dosas, biryani, burgers, chai, snacks..." autocomplete="off">
+          <button type="button" class="search-clear-btn" id="btn-search-clear" style="display: none;">✕</button>
+          <button type="button" class="search-submit-btn" id="btn-search-trigger">Find Food</button>
+        </div>
+      </div>
+
+      <!-- Right Header Actions (Sound, Cart, Profile) -->
+      <div class="header-actions">
+        <button type="button" class="sound-toggle-btn" id="btn-toggle-sound" title="Toggle Sound FX">🔊</button>
+
+        <!-- Plate / Shopping Cart Button -->
+        <button type="button" class="cart-toggle-btn" id="btn-open-cart" title="View Plate / Cart">
+          <span class="cart-icon-graphic">🛒</span>
+          <div class="cart-info-col">
+            <span class="cart-label-text">My Plate</span>
+            <span class="cart-badge-count" id="nav-cart-count">0</span>
+          </div>
+        </button>
+
+        <!-- User Profile & Direct Logout Button (Visible when logged in) -->
+        <div id="nav-user-logged-in-box" class="user-profile-wrapper" style="display: none;">
+          <div class="user-profile-menu" id="nav-user-profile" title="View Account Details">
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80" alt="User Avatar" class="user-avatar-img" id="nav-user-avatar">
+            <div class="user-profile-info">
+              <span class="user-profile-name" id="nav-user-name">User</span>
+              <span class="user-profile-role-badge" id="nav-user-role">Student</span>
+            </div>
+          </div>
+          <button type="button" class="user-logout-btn" id="btn-customer-logout" title="Log out">
+            🚪 Logout
+          </button>
+        </div>
+
+        <!-- Guest Auth Action Buttons (Default When Logged Out) -->
+        <div id="nav-guest-actions" class="guest-auth-actions" style="display: flex;">
+          <button type="button" class="nav-guest-btn nav-signin-btn" id="btn-open-signin">🔐 Sign In</button>
+          <button type="button" class="nav-guest-btn nav-signup-btn" id="btn-open-signup">✨ Register</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================================
+       CRIMSON RED NAVIGATION BAR
+       ====================================================================== -->
+  <nav class="crimson-navbar" id="crimson-navbar">
+    <div class="crimson-nav-inner">
+      <!-- Left Categories Dropdown Trigger -->
+      <div class="nav-cat-dropdown-btn" onclick="document.getElementById('categories-showcase')?.scrollIntoView({behavior: 'smooth'})">
+        <span class="nav-hamburger">☰</span>
+        <span class="nav-cat-text">Categories</span>
+        <span class="nav-caret">▼</span>
+      </div>
+
+      <!-- Main Navigation Links -->
+      <div class="crimson-nav-links" id="nav-links-container">
+        <button type="button" class="crimson-nav-btn active" data-view="menu" id="nav-btn-menu">Home</button>
+        <a href="#about-canteen" class="crimson-nav-link">About Us</a>
+        <a href="#menu-controls" class="crimson-nav-link" onclick="document.querySelector('[data-category=all]')?.click();">Products</a>
+        <a href="#special-offers" class="crimson-nav-link">Special Offers</a>
+        <button type="button" class="crimson-nav-btn" data-view="orders" id="nav-btn-orders">
+          📋 My Orders <span id="nav-active-orders-dot" style="display:none; width:8px; height:8px; background:#22c55e; border-radius:50%; margin-left:5px;"></span>
+        </button>
+        <a href="#site-footer" class="crimson-nav-link">Contact Us</a>
+      </div>
+
+      <!-- Right Action Cluster: Live Waiting Queue + Sticky Cart Button -->
+      <div class="crimson-nav-right">
+        <!-- Live Waiting Queue Indicator in Navbar -->
+        <div class="nav-queue-pill-badge" id="nav-queue-pill-badge" title="Live Canteen Queue Status">
+          <span class="queue-pulse-dot"></span>
+          <span class="queue-pill-text">Live Queue: <strong id="nav-queue-waiting-number">0</strong> Orders (<span id="nav-queue-waiting-time">Queue Clear</span>)</span>
+        </div>
+
+        <!-- Sticky Navbar Plate / Cart Trigger (Always visible while scrolling) -->
+        <button type="button" class="nav-plate-sticky-btn" id="btn-navbar-cart" title="View Food Plate / Cart">
+          <span class="plate-icon-anim">🍽️</span>
+          <span class="plate-text-label">My Plate</span>
+          <span class="plate-count-badge" id="nav-sticky-cart-count">0</span>
+          <span class="plate-subtotal-badge" id="nav-sticky-cart-total">₹0</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ======================================================================
+       VIEW 1: MENU & ORDERING BROWSER
+       ====================================================================== -->
+  <main id="view-menu" class="active-view">
+    <!-- HERO FOOD BANNER -->
+    <section class="canteen-hero-banner-section">
+      <div class="hero-banner-container">
+        <div class="hero-banner-inner">
+          <img src="assets/canteen-banner.jpg" alt="RIT Canteen Food Ordering Banner" class="hero-banner-img">
+          <div class="hero-banner-overlay"></div>
+          <div class="hero-banner-content">
+            <span class="hero-banner-tag">CAMPUS DIGITAL CAFETERIA</span>
+            <h1 class="hero-banner-title">RIT Canteen</h1>
+            <p class="hero-banner-desc">
+              Freshly prepared campus meals, cashless student wallet & express digital tokens. Order online and pick up hot food the moment your token is called!
+            </p>
+            <div class="hero-banner-btn-group">
+              <a href="#menu-controls" class="hero-shop-btn">Order Food Now</a>
+              <a href="#special-offers" class="hero-special-btn">Special Offers (Save 20%)</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 VALUE PROPOSITION / TRUST CARDS -->
+    <section class="trust-features-section">
+      <div class="trust-features-container">
+        <div class="trust-feature-card">
+          <div class="trust-icon-box">
+            <span class="trust-icon">✔</span>
+          </div>
+          <div class="trust-text-box">
+            <h3 class="trust-title">Quality Product</h3>
+            <p class="trust-desc">100% fresh, hygienic FSSAI 5-star campus meals</p>
+          </div>
+        </div>
+
+        <div class="trust-feature-card">
+          <div class="trust-icon-box">
+            <span class="trust-icon">⚡</span>
+          </div>
+          <div class="trust-text-box">
+            <h3 class="trust-title">Fast 8-Min Pickup</h3>
+            <p class="trust-desc">Automated kitchen token queue with live callouts</p>
+          </div>
+        </div>
+
+        <div class="trust-feature-card">
+          <div class="trust-icon-box">
+            <span class="trust-icon">💳</span>
+          </div>
+          <div class="trust-text-box">
+            <h3 class="trust-title">Easy Online & Counter Pay</h3>
+            <p class="trust-desc">UPI (GPay / PhonePe / Paytm), Cards & Cash Counter</p>
+          </div>
+        </div>
+
+        <div class="trust-feature-card">
+          <div class="trust-icon-box">
+            <span class="trust-icon">📞</span>
+          </div>
+          <div class="trust-text-box">
+            <h3 class="trust-title">24/7 Digital Support</h3>
+            <p class="trust-desc">Live counter display & token tracking on mobile</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY CHOOSE RIT CANTEEN -->
+    <section class="about-canteen-section" id="about-canteen">
+      <div class="about-canteen-container">
+        <h2 class="about-heading">Why Choose RIT Canteen?</h2>
+        <div class="about-red-line"></div>
+        <p class="about-description">
+          Designed exclusively for Rajarambapu Institute of Technology, RIT Canteen streamlines daily campus dining with 100% cashless ordering, instant live kitchen tokens, and hygienic preparation for students and faculty.
+        </p>
+
+        <div class="about-stats-grid">
+          <div class="about-stat-item">
+            <span class="about-stat-num">3,500+</span>
+            <span class="about-stat-label">Daily Campus Meals</span>
+          </div>
+          <div class="about-stat-item">
+            <span class="about-stat-num">&lt; 8 Mins</span>
+            <span class="about-stat-label">Average Wait Time</span>
+          </div>
+          <div class="about-stat-item">
+            <span class="about-stat-num">12+</span>
+            <span class="about-stat-label">Kitchen Stations</span>
+          </div>
+          <div class="about-stat-item">
+            <span class="about-stat-num">100%</span>
+            <span class="about-stat-label">Queue-Free Cashless</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 SPECIAL OFFER PROMO BANNERS -->
+    <section class="special-offers-section" id="special-offers">
+      <div class="special-offers-container">
+        <!-- Promo 1 -->
+        <div class="promo-banner-card promo-card-1" onclick="document.getElementById('menu-controls')?.scrollIntoView({behavior:'smooth'})">
+          <img src="assets/promo-burger-combo.jpg" alt="Student Special Offer" class="promo-img">
+          <div class="promo-overlay"></div>
+          <div class="promo-card-content">
+            <span class="promo-sub-badge">CAMPUS VALUE MEAL</span>
+            <span class="promo-discount-tag">SAVE 20%</span>
+            <h3 class="promo-title">Student Combo Deal</h3>
+            <p class="promo-desc">Jumbo Cheese Burger + Fries + Choco Shake</p>
+            <span class="promo-action-btn">Shop Now</span>
+          </div>
+        </div>
+
+        <!-- Promo 2 -->
+        <div class="promo-banner-card promo-card-2" onclick="document.getElementById('menu-controls')?.scrollIntoView({behavior:'smooth'})">
+          <img src="assets/promo-mobile-order.jpg" alt="Campus Mobile Snacks" class="promo-img">
+          <div class="promo-overlay"></div>
+          <div class="promo-card-content">
+            <span class="promo-sub-badge">EVENING BREAK SPECIAL</span>
+            <span class="promo-discount-tag">FRESH HOT</span>
+            <h3 class="promo-title">Snacks & Chai Break</h3>
+            <p class="promo-desc">Hot Samosas, Steamed Momos & Kadak Chai</p>
+            <span class="promo-action-btn">Shop Now</span>
+          </div>
+        </div>
+
+        <!-- Promo 3 -->
+        <div class="promo-banner-card promo-card-3" onclick="document.getElementById('menu-controls')?.scrollIntoView({behavior:'smooth'})">
+          <img src="assets/promo-thali-special.jpg" alt="Royal Lunch Thali" class="promo-img">
+          <div class="promo-overlay"></div>
+          <div class="promo-card-content">
+            <span class="promo-sub-badge">CHEF'S FRESH SPECIAL</span>
+            <span class="promo-discount-tag">LUNCH RUSH</span>
+            <h3 class="promo-title">Royal Lunch Thali</h3>
+            <p class="promo-desc">Paneer Butter Masala, Dal & Butter Naan</p>
+            <span class="promo-action-btn">Shop Now</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATEGORIES SHOWCASE GRID -->
+    <section class="categories-showcase-section" id="categories-showcase">
+      <div class="categories-container">
+        <h2 class="categories-section-heading">CATEGORIES</h2>
+        <div class="categories-grid">
+          <!-- 1. Beverages -->
+          <div class="category-item-card" onclick="document.querySelector('[data-category=beverages]')?.click(); document.getElementById('menu-controls')?.scrollIntoView({behavior:'smooth'})">
+            <div class="cat-img-box">
+              <img src="https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=250" alt="Fruits & Coolers" class="cat-img">
+            </div>
+            <div class="cat-text-box">
+              <h4 class="cat-item-title">Beverages</h4>
+              <p class="cat-item-desc">Fresh juices, cold coffee, cutting chai and fruit smoothies.</p>
+            </div>
+          </div>
+
+          <!-- 2. Breakfast -->
+          <div class="category-item-card" onclick="document.querySelector('[data-category=breakfast]')?.click(); document.getElementById('menu-controls')?.scrollIntoView({behavior:'smooth'})">
+            <div class="cat-img-box">
+              <img src="https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=250" alt="Breakfast" class="cat-img">
+            </div>
+            <div class="cat-text-box">
+              <h4 class="cat-item-title">Breakfast</h4>
+              <p class="cat-item-desc">Crispy masala dosa, steaming idli sambar, vada and poha.</p>
+            </div>
+          </div>
+
+          <!-- 3. South Indian -->
+          <div class="category-item-card" onclick="document.querySelector('[data-category=meals]')?.click(); document.getElementById('menu-controls')?.scrollIntoView({behavior:'smooth'})">
+            <div class="cat-img-box">
+              <img src="https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=250" alt="South Indian" class="cat-img">
+            </div>
+            <div class="cat-text-box">
+              <h4 class="cat-item-title">South Indian</h4>
+              <p class="cat-item-desc">Traditional campus mini meals, curd rice, and lemon rice.</p>
+            </div>
+          </div>
+
+          <!-- 4. Snacks & Chaat -->
+          <div class="category-item-card" onclick="document.querySelector('[data-category=snacks]')?.click(); document.getElementById('menu-controls')?.scrollIntoView({behavior:'smooth'})">
+            <div class="cat-img-box">
+              <img src="https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=250" alt="Snacks" class="cat-img">
+            </div>
+            <div class="cat-text-box">
+              <h4 class="cat-item-title">Snacks</h4>
+              <p class="cat-item-desc">Steamed momos, hot samosas, spring rolls and pakoras.</p>
+            </div>
+          </div>
+
+          <!-- 5. North Indian & Thalis -->
+          <div class="category-item-card" onclick="document.querySelector('[data-category=meals]')?.click(); document.getElementById('menu-controls')?.scrollIntoView({behavior:'smooth'})">
+            <div class="cat-img-box">
+              <img src="https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=250" alt="North Indian" class="cat-img">
+            </div>
+            <div class="cat-text-box">
+              <h4 class="cat-item-title">North Indian</h4>
+              <p class="cat-item-desc">Paneer butter masala, dal makhani, butter naan & biryani.</p>
+            </div>
+          </div>
+
+          <!-- 6. Fast Food & Pizza -->
+          <div class="category-item-card" onclick="document.querySelector('[data-category=fastfood]')?.click(); document.getElementById('menu-controls')?.scrollIntoView({behavior:'smooth'})">
+            <div class="cat-img-box">
+              <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=250" alt="Fast Food" class="cat-img">
+            </div>
+            <div class="cat-text-box">
+              <h4 class="cat-item-title">Fast Food</h4>
+              <p class="cat-item-desc">Jumbo cheese burgers, french fries, pizzas and sandwiches.</p>
+            </div>
+          </div>
+
+          <!-- 7. Desserts & Sweets -->
+          <div class="category-item-card" onclick="document.querySelector('[data-category=desserts]')?.click(); document.getElementById('menu-controls')?.scrollIntoView({behavior:'smooth'})">
+            <div class="cat-img-box">
+              <img src="https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=250" alt="Desserts" class="cat-img">
+            </div>
+            <div class="cat-text-box">
+              <h4 class="cat-item-title">Desserts</h4>
+              <p class="cat-item-desc">Hot gulab jamun, chocolate brownies and rich sundaes.</p>
+            </div>
+          </div>
+
+          <!-- 8. Student Combos -->
+          <div class="category-item-card" onclick="document.querySelector('[data-category=all]')?.click(); document.getElementById('menu-controls')?.scrollIntoView({behavior:'smooth'})">
+            <div class="cat-img-box">
+              <img src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=250" alt="Combos" class="cat-img">
+            </div>
+            <div class="cat-text-box">
+              <h4 class="cat-item-title">Value Combos</h4>
+              <p class="cat-item-desc">Special meal packs with student discounts.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVE CAFETERIA WAITING QUEUE & CALLOUT STRIP -->
+    <section class="live-queue-strip" id="live-queue-strip">
+      <div class="queue-strip-content">
+        <div class="queue-strip-item queue-calling">
+          <span class="live-pulse-dot"></span>
+          <span class="queue-label">NOW CALLING AT COUNTER:</span>
+          <strong class="queue-tokens-serving" id="queue-serving-tokens">#TK-101 (Counter 2)</strong>
+        </div>
+        <div class="queue-strip-divider">|</div>
+        <div class="queue-strip-item">
+          <span>🍳</span>
+          <span class="queue-label">KITCHEN QUEUE:</span>
+          <strong id="queue-waiting-count" style="color: #dc2626;">2 Orders in line</strong>
+        </div>
+        <div class="queue-strip-divider">|</div>
+        <div class="queue-strip-item">
+          <span>⏱️</span>
+          <span class="queue-label">EST. WAIT TIME:</span>
+          <strong id="queue-est-wait" style="color: #0284c7;">~6-8 Mins</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURED PRODUCTS (MENU DISHES) -->
+    <section class="featured-products-section" id="menu-controls">
+      <div class="featured-products-container">
+        <h2 class="featured-products-heading">FEATURED PRODUCTS</h2>
+        <div class="about-red-line"></div>
+
+        <!-- Category Tabs Horizontal Slider -->
+        <div class="category-tabs-scroll" id="category-tabs-row" role="tablist">
+          <button type="button" class="category-tab-btn active" data-category="all">🍽️ All Dishes</button>
+          <button type="button" class="category-tab-btn" data-category="breakfast">🍳 Breakfast</button>
+          <button type="button" class="category-tab-btn" data-category="snacks">🥟 Snacks & Street Food</button>
+          <button type="button" class="category-tab-btn" data-category="meals">🍛 Lunch & Thalis</button>
+          <button type="button" class="category-tab-btn" data-category="fastfood">🍔 Burgers & Fast Food</button>
+          <button type="button" class="category-tab-btn" data-category="beverages">☕ Beverages & Shakes</button>
+          <button type="button" class="category-tab-btn" data-category="desserts">🍯 Desserts & Sweets</button>
+        </div>
+
+        <!-- Subfilters: Diet, Popularity, and Price Sorting -->
+        <div class="subfilter-row">
+          <div class="diet-toggle-group">
+            <button type="button" class="diet-pill" data-diet="all">All</button>
+            <button type="button" class="diet-pill diet-veg" data-diet="veg">
+              <span class="diet-badge-icon veg"></span> Pure Veg
+            </button>
+            <button type="button" class="diet-pill diet-nonveg" data-diet="non-veg">
+              <span class="diet-badge-icon non-veg"></span> Non-Veg
+            </button>
+            <button type="button" class="diet-pill diet-popular" data-diet="popular">
+              ⭐ Bestsellers
+            </button>
+          </div>
+
+          <div class="sort-select-wrapper">
+            <label for="sort-dropdown-select">Sort by:</label>
+            <select id="sort-dropdown-select" class="sort-dropdown">
+              <option value="popular">Most Popular</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="time-quick">Fastest Prep Time</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Food Cards Grid -->
+        <div class="menu-cards-grid" id="menu-cards-container">
+          <!-- Rendered dynamically by app.js -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ======================================================================
+       VIEW 2: STUDENT / FACULTY ORDERS HISTORY & TOKENS
+       ====================================================================== -->
+  <main id="view-orders" style="display: none;">
+    <section class="orders-history-container">
+      <div class="orders-page-header">
+        <button type="button" class="orders-back-menu-btn" id="btn-back-to-menu">
+          ← Back to Food Menu
+        </button>
+        <div class="orders-title-block">
+          <h2 class="orders-main-title">📋 My Orders & Token Slips</h2>
+          <p class="orders-main-desc">Track live kitchen preparation status, display your token at the pickup counter, or view previous meal receipts.</p>
+        </div>
+      </div>
+
+      <div id="orders-history-list">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+  </main>
+
+  <!-- ======================================================================
+       PROFESSIONAL CORPORATE FOOTER (Zero Developer Details - RIT CANTEEN)
+       ====================================================================== -->
+  <footer class="site-footer" id="site-footer">
+    <div class="footer-container">
+      <div class="footer-top-grid">
+        <!-- Col 1: Get in Touch -->
+        <div class="footer-col">
+          <h4 class="footer-col-title">RIT CANTEEN</h4>
+          <p class="footer-col-desc">
+            RIT Canteen provides fresh, hygienic campus dining with cashless student wallet payments and instant digital pickup tokens.
+          </p>
+          <div class="footer-contact-items">
+            <div class="contact-item">
+              <span class="contact-icon">📍</span>
+              <span>Canteen Block, Rajarambapu Institute of Technology, Rajaramnagar, Sakharale, Islampur, Maharashtra - 415414</span>
+            </div>
+            <div class="contact-item">
+              <span class="contact-icon">✉️</span>
+              <span>canteen@ritindia.edu</span>
+            </div>
+            <div class="contact-item">
+              <span class="contact-icon">📞</span>
+              <span>+91 2342 220 329 / +91 98765 43210</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Col 2: Quick Shop -->
+        <div class="footer-col">
+          <h4 class="footer-col-title">QUICK LINKS</h4>
+          <ul class="footer-links-list">
+            <li><a href="#" onclick="switchView('menu'); window.scrollTo({top:0, behavior:'smooth'});">› Home</a></li>
+            <li><a href="#about-canteen">› About Us</a></li>
+            <li><a href="#menu-controls">› All Products</a></li>
+            <li><a href="#categories-showcase">› Categories</a></li>
+            <li><a href="#special-offers">› Special Offers</a></li>
+            <li><a href="#" onclick="switchView('orders');">› Track Token</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: My Account / Services -->
+        <div class="footer-col">
+          <h4 class="footer-col-title">CAMPUS SERVICES</h4>
+          <ul class="footer-links-list">
+            <li><a href="#" onclick="switchView('orders');">› Track Token & Orders</a></li>
+            <li><a href="#" onclick="document.getElementById('btn-open-cart')?.click();">› Shopping Plate / Cart</a></li>
+            <li><a href="#" onclick="switchView('orders');">› Checkout Status</a></li>
+            <li><a href="#" id="footer-login-link">› Student & Faculty Sign In</a></li>
+            <li><a href="#menu-controls">› Dietary & FSSAI Info</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Newsletter & Follow Us -->
+        <div class="footer-col">
+          <h4 class="footer-col-title">NEWSLETTER</h4>
+          <p class="footer-col-desc">Subscribe to receive daily cafeteria lunch specials and student discount alerts.</p>
+          <form class="footer-newsletter-form" onsubmit="event.preventDefault(); alert('Subscribed to RIT Canteen daily specials!');">
+            <input type="email" placeholder="Your Email Address" required class="newsletter-input">
+            <button type="submit" class="newsletter-submit-btn">Sign Up</button>
+          </form>
+          <div class="footer-social-section">
+            <span class="social-title">FOLLOW US</span>
+            <div class="footer-social-icons">
+              <a href="#" class="social-icon" title="Twitter / X">𝕏</a>
+              <a href="#" class="social-icon" title="Facebook">f</a>
+              <a href="#" class="social-icon" title="LinkedIn">in</a>
+              <a href="#" class="social-icon" title="Instagram">📷</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Bar with Payment Options and Copyright -->
+      <div class="footer-bottom-bar">
+        <div class="footer-payment-badges">
+          <span class="pay-badge">💳 Visa</span>
+          <span class="pay-badge">💳 MasterCard</span>
+          <span class="pay-badge">💳 RuPay</span>
+          <span class="pay-badge">📱 UPI</span>
+          <span class="pay-badge">🎓 Student ID</span>
+        </div>
+        <div class="footer-copyright-text">
+          © 2026 RIT Canteen. All Rights Reserved. Rajarambapu Institute of Technology.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======================================================================
+       DRAWER: CART / PLATE SLIDE-OVER
+       ====================================================================== -->
+  <div class="cart-drawer-overlay" id="cart-drawer-overlay" aria-hidden="true">
+    <aside class="cart-drawer" aria-label="Shopping Cart">
+      <div class="cart-drawer-header">
+        <h3 class="cart-header-title">
+          <span>🛒 Your Food Plate</span>
+          <span style="font-size: 0.9rem; color: #dc2626;" id="cart-item-count-label">(0 items)</span>
+        </h3>
+        <button type="button" class="cart-close-btn" id="btn-close-cart" aria-label="Close Plate">✕</button>
+      </div>
+
+      <div class="cart-items-body" id="cart-items-container">
+        <!-- Populated dynamically -->
+      </div>
+
+      <div class="cart-drawer-footer" id="cart-footer-section">
+        <!-- Order Type Toggle -->
+        <div class="order-type-selector">
+          <button type="button" class="order-type-btn active" data-type="takeaway" id="btn-ordertype-takeaway">
+            <span>🛍️</span> Takeaway / Express
+          </button>
+          <button type="button" class="order-type-btn" data-type="dine-in" id="btn-ordertype-dinein">
+            <span>🍽️</span> Dine-in Table
+          </button>
+        </div>
+
+        <div id="table-select-row" style="display: none; margin-bottom: 0.75rem;">
+          <input type="text" id="table-number-input" placeholder="Enter Table Number (e.g. Table 6)" style="width: 100%;">
+        </div>
+
+        <!-- Kitchen Special Notes -->
+        <div style="margin-bottom: 0.85rem;">
+          <input type="text" id="kitchen-notes-input" placeholder="Cooking instructions (e.g. less spicy, extra ketchup)" style="width: 100%;">
+        </div>
+
+        <!-- Coupon Promo Code -->
+        <div class="coupon-input-box">
+          <input type="text" id="coupon-code-input" placeholder="Promo code (e.g. RIT20)">
+          <button type="button" class="coupon-apply-btn" id="btn-apply-coupon">Apply</button>
+        </div>
+        <div id="coupon-status-msg" style="font-size: 0.78rem; margin-top: -0.5rem; margin-bottom: 0.6rem;"></div>
+
+        <!-- Price Breakdown -->
+        <div class="cart-calc-row">
+          <span>Subtotal</span>
+          <span id="cart-subtotal-val">₹0</span>
+        </div>
+        <div class="cart-calc-row" id="cart-discount-row" style="display: none; color: #16a34a;">
+          <span>Discount Applied</span>
+          <span id="cart-discount-val">-₹0</span>
+        </div>
+        <div class="cart-calc-row">
+          <span>Taxes & Canteen Cess</span>
+          <span>₹0.00</span>
+        </div>
+        <div class="cart-calc-row total-row">
+          <span>Grand Total</span>
+          <span id="cart-grandtotal-val" style="color: #dc2626; font-weight:800;">₹0</span>
+        </div>
+
+        <!-- Payment Mode Select -->
+        <div style="margin-top: 0.85rem;">
+          <label style="font-size: 0.78rem; font-weight: 700; color: #64748b; display: block; margin-bottom: 0.3rem;">Payment Method:</label>
+          <select id="payment-method-select" style="width: 100%;">
+            <option value="upi">📱 UPI / QR Scan (Google Pay / PhonePe / Paytm)</option>
+            <option value="cash_on_counter">💵 Cash at Counter Pickup</option>
+            <option value="card_on_counter">💳 Card at Counter (Debit / Credit)</option>
+          </select>
+        </div>
+
+        <!-- Checkout Submit Button -->
+        <button type="button" class="checkout-submit-btn" id="btn-place-order">
+          <span>Place Order & Get Token</span>
+          <span>➜</span>
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 1: ORDER TOKEN SLIP & QR RECEIPT
+       ====================================================================== -->
+  <div class="modal-backdrop" id="modal-token-slip" aria-hidden="true">
+    <div class="token-slip-card">
+      <div class="token-chip-banner">Official RIT Canteen Token</div>
+      <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.2rem;">Your Pickup Token Number</div>
+      <div class="token-big-number" id="token-modal-number">#TK-105</div>
+      <div class="token-counter-location" id="token-modal-counter">Counter #2 (Thali & Meals)</div>
+
+      <!-- Live Stepper -->
+      <div class="order-status-stepper">
+        <div class="stepper-progress-bar">
+          <div class="stepper-progress-fill" id="token-modal-progress-fill" style="width: 25%;"></div>
+        </div>
+
+        <div class="step-node active" id="step-node-1">
+          <div class="step-circle">1</div>
+          <span class="step-title">Received</span>
+        </div>
+        <div class="step-node" id="step-node-2">
+          <div class="step-circle">2</div>
+          <span class="step-title">Cooking</span>
+        </div>
+        <div class="step-node" id="step-node-3">
+          <div class="step-circle">3</div>
+          <span class="step-title">Ready</span>
+        </div>
+        <div class="step-node" id="step-node-4">
+          <div class="step-circle">4</div>
+          <span class="step-title">Served</span>
+        </div>
+      </div>
+
+      <div style="font-size: 0.88rem; color: #ea580c; font-weight: 700;" id="token-modal-est-time">
+        ⏱️ Estimated Prep Time: ~8 Mins
+      </div>
+
+      <!-- Real-time Queue Place Indicator -->
+      <div class="token-queue-indicator" id="token-modal-queue-indicator">
+        <div class="queue-badge-row">
+          <span class="live-pulse-dot"></span>
+          <span class="queue-title-text">Live Cafeteria Queue Status</span>
+        </div>
+        <div class="queue-pos-number" id="token-modal-queue-pos">Queue Position: #1 (Next in Line!)</div>
+        <div class="queue-orders-ahead-desc" id="token-modal-orders-ahead">0 orders being prepared ahead of you</div>
+      </div>
+
+      <!-- High-res QR Code (SVG) -->
+      <div class="qr-code-box" id="token-modal-qr-box">
+        <!-- Generated dynamically via SVG -->
+      </div>
+      <p style="font-size: 0.75rem; color: #64748b;">Show this digital token & QR code at the counter for pickup.</p>
+
+      <div class="token-modal-actions">
+        <button type="button" class="modal-action-btn btn-secondary" id="btn-close-token-modal">Done / Close</button>
+        <button type="button" class="modal-action-btn btn-primary" id="btn-print-token">🖨️ Print Slip</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- ======================================================================
+       MODAL 3: CUSTOMER AUTHENTICATION (STUDENT / FACULTY)
+       ====================================================================== -->
+  <div class="modal-backdrop" id="modal-auth" aria-hidden="true">
+    <div class="auth-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0;">🔐 RIT Canteen Account</h3>
+        <button type="button" class="cart-close-btn" id="btn-close-auth-modal" aria-label="Close dialog">✕</button>
+      </div>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab-btn active" id="tab-btn-login">Sign In</button>
+        <button type="button" class="auth-tab-btn" id="tab-btn-register">Create Account</button>
+      </div>
+
+      <!-- Customer Login Form -->
+      <form id="form-login">
+        <div class="form-group">
+          <label for="login-email">Campus Email Address:</label>
+          <input type="email" id="login-email" required placeholder="student@campus.edu">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Account Password:</label>
+          <input type="password" id="login-password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="checkout-submit-btn" style="margin-top: 0.5rem;">
+          Sign In to RIT Canteen
+        </button>
+
+        <p class="auth-switch-text">
+          Don't have an account? 
+          <button type="button" class="auth-switch-link" id="link-to-register">Sign Up now</button>
+        </p>
+      </form>
+
+      <!-- Customer Register Form -->
+      <form id="form-register" style="display: none;">
+        <div class="form-group">
+          <label for="reg-name">Full Name:</label>
+          <input type="text" id="reg-name" required placeholder="e.g. Rohan Verma">
+        </div>
+        <div class="form-group">
+          <label for="reg-email">Campus Email Address:</label>
+          <input type="email" id="reg-email" required placeholder="rohan@campus.edu">
+        </div>
+        <div class="form-group">
+          <label for="reg-role">Account Type:</label>
+          <select id="reg-role" required>
+            <option value="student">🎓 Student (₹250 Welcome Bonus)</option>
+            <option value="faculty">👨‍🏫 Faculty / Staff (10% Discount)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="reg-id">Roll No / Campus Staff ID:</label>
+          <input type="text" id="reg-id" placeholder="e.g. 2024CS089">
+        </div>
+        <div class="form-group">
+          <label for="reg-password">Create Password:</label>
+          <input type="password" id="reg-password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="checkout-submit-btn" style="margin-top: 0.5rem;">
+          Create Free Account (+₹250 Bonus)
+        </button>
+
+        <p class="auth-switch-text">
+          Already registered? 
+          <button type="button" class="auth-switch-link" id="link-to-login">Sign In here</button>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- Application Logic Scripts -->
+  <script src="data.js"></script>
+  <script src="db.js"></script>
+  <script src="sound.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
